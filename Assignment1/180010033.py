@@ -99,7 +99,6 @@ class Maze:
         self.graph[0][0].found = True;
 
     def BFS(self): 
-        states = 0;
         q = Queue();
         print(self.dest)
         q.put(self.curr);
@@ -110,7 +109,6 @@ class Maze:
             else :
                 self.curr = q.get();
                 self.graph[self.curr[0]][self.curr[1]].visited = True;
-                states+=1;
                 # self.graph[self.curr[0]][self.curr[1]].depth = self.graph[self.curr[0]][self.curr[1]].parent.depth + 1;
 
                 nbrs = [];
@@ -125,7 +123,7 @@ class Maze:
                         self.graph[nbrs[i][0]][nbrs[i][1]].found = True;
                         self.graph[nbrs[i][0]][nbrs[i][1]].parent = self.graph[self.curr[0]][self.curr[1]]
 
-        print(states);
+        print(self.getVisited());
 
     def reverse(self): 
         length = 1;
