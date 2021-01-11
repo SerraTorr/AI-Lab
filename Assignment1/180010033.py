@@ -68,12 +68,12 @@ class Maze:
         self.graph[0][0].data = '0';
 
     def search(self):
-        if self.mode == 0:
-            BFS()
-        elif self.mode == 1:
-            DFS()
-        elif self.mode == 2:
-            DFID()
+        if self.mode == '0':
+            self.BFS()
+        elif self.mode == '1':
+            self.DFS()
+        # elif self.mode == '2':
+            # DFID()
         else :
             print("Enter a valid choice of algorithm\n");
 
@@ -102,7 +102,6 @@ class Maze:
 
     def BFS(self): 
         q = Queue();
-        print(self.dest)
         q.put(self.curr);
         self.graph[self.curr[0]][self.curr[1]].visited = True;
         while not q.empty():
@@ -127,6 +126,34 @@ class Maze:
 
         print(self.getVisited())
 
+    def DFS(self): 
+
+        stack = [];
+        stack.append(self.curr);
+        self.graph[self.curr[0]][self.curr[1]].visited = True
+        self.graph[self.curr[0]][self.curr[1]].depth = 0;
+
+        
+        while len(stack) > 0: 
+            if goaltest(self.curr, self.dest) : 
+                break;
+            else :
+                self.curr = stack.pop();
+                self.graph[self.curr[0]][self.curr[1]].visited = True
+
+                nbrs = []
+                for i in range(4): 
+                    nbrs.append([-1,-1])
+
+                moveGen(self.curr, nbrs, self.graph)
+                for i in range(4):
+                    if(nbrs[i][0] != -1 and nbrs[i][1] != -1):
+                        stack.append(nbrs[i]);
+                        self.graph[nbrs[i][0]][nbrs[i][1]].found = True
+                        self.graph[nbrs[i][0]][nbrs[i][1]].depth = self.graph[self.curr[0]][self.curr[1]].depth+1;
+                        self.graph[nbrs[i][0]][nbrs[i][1]].parent = self.graph[self.curr[0]][self.curr[1]]
+        print(self.getVisited())
+
     def reverse(self): 
         length = 1;
         tracker = self.graph[self.dest[0]][self.dest[1]];
@@ -145,8 +172,9 @@ class Maze:
                 
 def main(): 
     M = Maze(sys.argv[1]);
-    M.BFS();
+    M.search();
     M.reverse();
     M.display();
+    M.reset();
 
 main();
