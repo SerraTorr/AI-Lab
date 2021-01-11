@@ -2,8 +2,8 @@ from queue import Queue;
 import sys;
 
 class Node:
-    loc = []
     def __init__(self, row, col, data):
+        self.loc = []
         self.loc.append(row)
         self.loc.append(col)
         self.data = data
@@ -15,10 +15,10 @@ class Node:
 def moveGen(curr, neighbors, graph):
     # DURL being the order
     maybe_nbrs = []
-    maybe_nbrs.append((curr[0]+1, curr[1]))
-    maybe_nbrs.append((curr[0]-1, curr[1]))
-    maybe_nbrs.append((curr[0], curr[1]+1))
-    maybe_nbrs.append((curr[0], curr[1]-1))
+    maybe_nbrs.append([curr[0]+1, curr[1]])
+    maybe_nbrs.append([curr[0]-1, curr[1]])
+    maybe_nbrs.append([curr[0], curr[1]+1])
+    maybe_nbrs.append([curr[0], curr[1]-1])
 
     #check for empty and undiscovered neighbours and update
     for i in range(4):  
@@ -79,12 +79,14 @@ class Maze:
 
     def getVisited(self):
         states = 0;
+        # print(graph.visited);
         for i in range(self.row):
             for j in range(self.cols):
                 if self.graph[i][j].visited == True: 
                     states += 1;
         
         return states;  
+
 
     def reset(self): 
         self.curr = [0,0]
@@ -104,8 +106,8 @@ class Maze:
         q.put(self.curr);
         self.graph[self.curr[0]][self.curr[1]].visited = True;
         while not q.empty():
-            if goaltest(self.curr, self.dest) == True:
-                break;
+            if goaltest(self.curr, self.dest):
+                break
             else :
                 self.curr = q.get();
                 self.graph[self.curr[0]][self.curr[1]].visited = True;
@@ -123,7 +125,7 @@ class Maze:
                         self.graph[nbrs[i][0]][nbrs[i][1]].found = True;
                         self.graph[nbrs[i][0]][nbrs[i][1]].parent = self.graph[self.curr[0]][self.curr[1]]
 
-        print(self.getVisited());
+        print(self.getVisited())
 
     def reverse(self): 
         length = 1;
@@ -139,7 +141,6 @@ class Maze:
         for i in range(self.row):
             for j in range(self.cols):
                 print(self.graph[i][j].data, end = '')
-            print('\n')
 
                 
 def main(): 
@@ -149,4 +150,3 @@ def main():
     M.display();
 
 main();
-
