@@ -72,8 +72,8 @@ class Maze:
             self.BFS()
         elif self.mode == '1':
             self.DFS()
-        # elif self.mode == '2':
-            # DFID()
+        elif self.mode == '2':
+            self.DFID()
         else :
             print("Enter a valid choice of algorithm\n");
 
@@ -153,6 +153,40 @@ class Maze:
                         self.graph[nbrs[i][0]][nbrs[i][1]].depth = self.graph[self.curr[0]][self.curr[1]].depth+1;
                         self.graph[nbrs[i][0]][nbrs[i][1]].parent = self.graph[self.curr[0]][self.curr[1]]
         print(self.getVisited())
+
+
+    def dfs_dfid(self, max_depth, node):
+        self.curr = [node.loc[0], node.loc[1]]
+        if goaltest(self.curr, self.dest): 
+            return self.getVisited();
+
+        nbrs = [];
+        for i in range(4): 
+            nbrs.append([-1,-1]);
+        node.visited = True;
+        self.states_dfid+=1;
+        moveGen(self.curr, nbrs, self.graph)
+        for i in range(4): 
+            if(nbrs[i][0] != -1 and nbrs[i][1] != -1) and node.depth+1 <= max_depth:
+                self.graph[nbrs[i][0]][nbrs[i][1]].found = True
+                self.graph[nbrs[i][0]][nbrs[i][1]].depth = node.depth+1;
+                self.graph[nbrs[i][0]][nbrs[i][1]].parent = node
+                self.dfs_dfid(max_depth, self.graph[nbrs[i][0]][nbrs[i][1]]);
+                if goaltest(self.curr, self.dest): 
+                    return self.getVisited();
+        
+
+    def DFID(self): 
+        max_depth = 0;
+        self.states_dfid = 0;
+        while not goaltest(self.curr, self.dest):
+            self.reset();
+            temp = self.dfs_dfid(max_depth, self.graph[self.curr[0]][self.curr[1]]);
+            # print()
+            max_depth+=1;
+            
+
+        print(self.states_dfid);          
 
     def reverse(self): 
         length = 1;
