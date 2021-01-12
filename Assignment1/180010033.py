@@ -168,6 +168,7 @@ class Maze:
         for i in range(self.row):
             for j in range(self.cols):
                 print(self.graph[i][j].data, end = '')
+            print("\n", end = '')
 
                 
 def main(): 
