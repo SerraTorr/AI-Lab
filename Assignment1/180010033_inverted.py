@@ -13,22 +13,19 @@ class Node:
         self.parent = None
 
 def moveGen(curr, neighbors, graph):
-    # Left Right Up Down
+    #Down Up Right Left
     maybe_nbrs = []
-
-    maybe_nbrs.append([curr[0], curr[1]-1])
-    maybe_nbrs.append([curr[0], curr[1]+1])
-    maybe_nbrs.append([curr[0]-1, curr[1]])
     maybe_nbrs.append([curr[0]+1, curr[1]])
+    maybe_nbrs.append([curr[0]-1, curr[1]])
+    maybe_nbrs.append([curr[0], curr[1]+1])
+    maybe_nbrs.append([curr[0], curr[1]-1])
 
     #check for empty and undiscovered neighbours and update
     for i in range(4):
         if maybe_nbrs[i][0] >= 0 and maybe_nbrs[i][1] >= 0:
             #check if visited/found already
-            # print("maybe printing : ", maybe_nbrs[i][0], maybe_nbrs[i][1])
             if (graph[maybe_nbrs[i][0]][maybe_nbrs[i][1]].visited == True or graph[maybe_nbrs[i][0]][maybe_nbrs[i][1]].found == True) and graph[curr[0]][curr[1]].depth + 1 >= graph[maybe_nbrs[i][0]][maybe_nbrs[i][1]].depth:
                 continue
-            # print("moving")
             #move only if free or goal
             curr_char = graph[maybe_nbrs[i][0]][maybe_nbrs[i][1]].data
             if curr_char == ' ' or curr_char == '*':
@@ -106,7 +103,6 @@ class Maze:
         q.put(self.curr);
         self.graph[self.curr[0]][self.curr[1]].visited = True;
         while not q.empty():
-            # print("current",self.curr[0],self.curr[1])
             if goaltest(self.curr, self.dest):
                 break
             else :
@@ -121,7 +117,6 @@ class Maze:
                 moveGen(self.curr, nbrs, self.graph);
 
                 for i in range(4):
-
                     if(nbrs[i][0] != -1 and nbrs[i][1] != -1):
                         q.put(nbrs[i])
                         self.graph[nbrs[i][0]][nbrs[i][1]].found = True;
@@ -197,7 +192,7 @@ class Maze:
             tracker = tracker.parent
             length += 1;
 
-        print(length, end=" ");
+        print(length);
 
     def display(self):
         for i in range(self.row):
@@ -205,11 +200,9 @@ class Maze:
                 print(self.graph[i][j].data, end = '')
             print("\n", end = '')
 
-
 def main():
     M = Maze(sys.argv[1]);
 
-    print(" ", end="")
     M.search();
     M.reverse();
     # M.display();

@@ -7,7 +7,7 @@ do
         for k in 0 1 2
         do
             echo -n $k $i $j
-            python3 maze_retrival.py $i $j $k > test1.txt && python3 180010033.py test1.txt
+            python3 maze_retrival.py $i $j $k > test1.txt && python3 180010033.py test1.txt && python3 180010033_inverted.py test1.txt
         done
     done
 done
