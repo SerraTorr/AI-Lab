@@ -209,10 +209,11 @@ class Maze:
 def main():
     M = Maze(sys.argv[1]);
 
-    print(" ", end="")
+    # print(" ", end="")
     M.search();
     M.reverse();
-    # M.display();
+    print()
+    M.display();
     M.reset();
 
 main();

@@ -1,10 +1,10 @@
 # AI Lab 1 Report
 
 ## Libraries Required
+BeautifulSoup  
 matplot  
 numpy  
 requests  
-BeautifulSoup  
 SciPy  
 mpl_toolkits  
 
@@ -39,5 +39,7 @@ e.g
 
 #### To test for multiple maze
 
-`bash bash.sh`  
+`bash bash.sh > table.txt`
+Values in the table.txt are in the format algorithm used", "rows", "cols", "states_explored for order down up right left", "path length for order down up right left", "states explored for order left right up down", "path length for order left right up down"  
+   
 bash.sh could be modified to test for different ranges of width and height.
