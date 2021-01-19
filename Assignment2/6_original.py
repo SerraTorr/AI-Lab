@@ -38,7 +38,7 @@ class candidate_design:
                 return
 
             children = movGen(current)
-            sort_(children)
+            children = sort_(children, goal)
             for child in children:
                 id = unique_identifier(child.design)
                 if not (id in visited):
@@ -58,12 +58,22 @@ def unique_identifier(design):
         string = ''.join([string,"|"])
     return string
 
-def sort_(children):
+def sort_(children,goal):
     """
     sort the children according to selected heuristic
     """
+    sorted_children = []
+    for child in children:
+        obj = None
+        cost = 10000 #make it INT_MAX
+        for child in children:
+            if(heuristic(2,child,goal) < cost):
+                cost = heuristic(2,child,goal)
+                obj = child
+        sorted_children.append(obj)
+        children.remove(obj)
 
-    return children
+    return sorted_children
 
 def goalTest(design_one, GoalDesign):
     """
@@ -102,10 +112,12 @@ def movGen(design):
 
 def heuristic(heuristic_number, design, goalDesign):
     """
+    Input: design and goalDesign are candidate_state class
     heuristic_number 1 : underestimating
-    heuristic_number 2 : overestimating
+    heuristic_number 2 : Just Perfect
+    heuristic_number 3 : Overestimating (manhattan distance)
     """
-    
+
     temp = deepcopy(design)
     goal = deepcopy(goalDesign)
     cost = 0
@@ -116,12 +128,34 @@ def heuristic(heuristic_number, design, goalDesign):
 
         for stack,goal_stack in zip(stacks,goal_stacks):
             cost += abs(len(stack) - len(goal_stack))
-            print("cost : ",cost)
+    elif heuristic_number == 2:
+        """
+        check for all blocks in goal state--> if corresponding test state doesn't contain same block then add one to the cost
+        """
+        stacks = deepcopy(temp.design)
+        goal_stacks = deepcopy(goal.design)
+
+        stack_no = 0
+        elem_no = 0
+        for stack in goal_stacks:
+            for element in stack:
+                if elem_no < len(stacks[stack_no]):
+                    if not (stacks[stack_no][elem_no] == element):
+                        cost += 1
+                else :
+                    cost += 1
+                elem_no += 1
+            stack_no += 1
+        cost = cost // 2
+
     return cost
-#
-# yo = candidate_design([[1], [2], [3]], None, 0, 0)
-# yoyo = candidate_design([[3,2], [], [1]], None, 0, 0)
-# yo.Best_first_search(yoyo, yo)
+
+
+yo = candidate_design([[3], [2], [1]], None, 0, 0)
+yoyo = candidate_design([[1,2,3], [], []], None, 0, 0)
+print(heuristic(2,yo,yoyo))
+
+yo.Best_first_search(yoyo, yo)
 
 # state = yoyo
 # while state != None:
