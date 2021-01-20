@@ -19,11 +19,16 @@ class candidate_design:
         self.to_ = to_
 
     def Best_first_search(self, goal_design, start_design):
-
+        """
+        Best First Search:
+        sort the children according to the selected heuristic and perform BFS
+        """
         goal = deepcopy(goal_design)
         start = deepcopy(start_design)
+
         queue = []
         visited = []
+
         queue.append(start)
 
         while len(queue):
@@ -37,13 +42,74 @@ class candidate_design:
                     current = current.parent
                 return
 
+            #generate all possible children for current node
             children = movGen(current)
+            #sort according to selected heuristic
             children = sort_(children, goal)
+            
             for child in children:
                 id = unique_identifier(child.design)
                 if not (id in visited):
                     child.parent = current
                     queue.append(child)
+
+    def hill_climbing(self, goal_design, start_design):
+        """
+        Hill Climbing approach :
+        Always chose the best and discard the rest.
+        If goal state found return
+        else stuck at local maxima
+
+        change heuristic function to try different
+        """
+
+        goal = deepcopy(goal_design)
+        start = deepcopy(start_design)
+
+        queue = []
+        visited = []
+
+        queue.append(start)
+
+        while len(queue):
+            current = queue.pop()
+            visited.append(unique_identifier(current.design))
+
+            if goalTest(current.design, goal.design) == True:
+                #traching back to reach initial state
+                while current != None:
+                    print(current.design)
+                    current = current.parent
+                return
+
+            #generate all possible children for current node
+            children = movGen(current)
+            #sort according to selected heuristic
+            children = sort_(children, goal)
+
+            # if none of the children has less cost then current state stuck at local maxima
+            if heuristic(2, current, goal) <= heuristic(2, children[0], goal):
+                print("Stuck at local maxima")
+                children = []
+                return
+            # else chose the best child and discard the rest
+            else:
+                children = [children[0]]
+
+            for child in children:
+                id = unique_identifier(child.design)
+
+                if goalTest(child.design, goal.design) == True:
+                    #traching back to reach initial state
+                    while child != None:
+                        print(child.design)
+                        child = child.parent
+                    return
+
+                if not (id in visited):
+                    child.parent = current
+                    queue.append(child)
+
 
 def unique_identifier(design):
     """
@@ -138,6 +204,7 @@ def heuristic(heuristic_number, design, goalDesign):
         stack_no = 0
         elem_no = 0
         for stack in goal_stacks:
+            elem_no = 0
             for element in stack:
                 if elem_no < len(stacks[stack_no]):
                     if not (stacks[stack_no][elem_no] == element):
@@ -145,17 +212,27 @@ def heuristic(heuristic_number, design, goalDesign):
                 else :
                     cost += 1
                 elem_no += 1
+                # print("cost",cost)
+            if elem_no < len(stacks[stack_no]) :
+                cost += len(stacks[stack_no]) - elem_no
             stack_no += 1
         cost = cost // 2
 
     return cost
 
 
-yo = candidate_design([[3], [2], [1]], None, 0, 0)
+yo = candidate_design([[1,2], [3], []], None, 0, 0)
 yoyo = candidate_design([[1,2,3], [], []], None, 0, 0)
+print(heuristic(2,yo,yoyo))
+eyo = deepcopy(yo)
+eyoyo = deepcopy(yoyo)
 print(heuristic(2,yo,yoyo))
 
 yo.Best_first_search(yoyo, yo)
+
+print("hill climbing")
+yo.hill_climbing(eyoyo, eyo)
+
 
 # state = yoyo
 # while state != None:
