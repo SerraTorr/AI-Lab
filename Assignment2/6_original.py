@@ -34,6 +34,7 @@ class candidate_design:
         while len(queue):
             current = queue.pop()
             visited.append(unique_identifier(current.design))
+            print("current: ", current.design)
 
             if goalTest(current.design, goal.design) == True:
                 #traching back to reach initial state
@@ -45,8 +46,19 @@ class candidate_design:
             #generate all possible children for current node
             children = movGen(current)
             #sort according to selected heuristic
+            # l = len(children)
+            # for child in children:
+            #     print("child:",child.design,end=" ")
             children = sort_(children, goal)
-            
+            # m = len(children)
+
+            # print()
+            # for child in children:
+            #     print("child:",child.design,end=" ")
+            #
+            # if l != m:
+            #     print("booooooooooo")
+
             for child in children:
                 id = unique_identifier(child.design)
                 if not (id in visited):
@@ -85,10 +97,14 @@ class candidate_design:
             #generate all possible children for current node
             children = movGen(current)
             #sort according to selected heuristic
-            children = sort_(children, goal)
+            # children = sort_(children, goal)
 
+            find = maximum_(children,goal)
+            print(find.design)
+            # for child in children:
+            #     print(child.design)
             # if none of the children has less cost then current state stuck at local maxima
-            if heuristic(2, current, goal) <= heuristic(2, children[0], goal):
+            if heuristic(2, current, goal) <= heuristic(2, find, goal):
                 print("Stuck at local maxima")
                 children = []
                 return
@@ -124,20 +140,36 @@ def unique_identifier(design):
         string = ''.join([string,"|"])
     return string
 
+def maximum_(children,goal):
+    deep_cp = deepcopy(children)
+    min_ = 1000
+    obj = None
+
+    for d_child in deep_cp:
+        cost = heuristic(2,d_child,goal)
+        if cost < min_:
+            min_ = heuristic(2,d_child,goal)
+            obj = d_child
+    return obj
+
+
 def sort_(children,goal):
     """
     sort the children according to selected heuristic
     """
     sorted_children = []
+
+    deep_copy = deepcopy(children)
+
     for child in children:
         obj = None
         cost = 10000 #make it INT_MAX
-        for child in children:
+        for child in deep_copy:
             if(heuristic(2,child,goal) < cost):
                 cost = heuristic(2,child,goal)
                 obj = child
         sorted_children.append(obj)
-        children.remove(obj)
+        deep_copy.remove(obj)
 
     return sorted_children
 
@@ -220,26 +252,14 @@ def heuristic(heuristic_number, design, goalDesign):
 
     return cost
 
-
-yo = candidate_design([[1,2], [3], []], None, 0, 0)
-yoyo = candidate_design([[1,2,3], [], []], None, 0, 0)
-print(heuristic(2,yo,yoyo))
+yo = candidate_design([[4], [],[3,6,1,2,5]], None, 0, 0)
+yoyo = candidate_design([[5,2,4], [3], [1,6]], None, 0, 0)
+# print(heuristic(2,yo,yoyo))
 eyo = deepcopy(yo)
 eyoyo = deepcopy(yoyo)
-print(heuristic(2,yo,yoyo))
-
-yo.Best_first_search(yoyo, yo)
-
+# # print(heuristic(2,yo,yoyo))
+#
+# yo.Best_first_search(yoyo, yo)
+#
 print("hill climbing")
 yo.hill_climbing(eyoyo, eyo)
-
-
-# state = yoyo
-# while state != None:
-#     print(state.design)
-#     state = state.parent
-# print(heuristic(1,yo,yoyo))
-
-# children = movGen(yo)
-# for child in children:
-#     print(child.design)
