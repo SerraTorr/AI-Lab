@@ -242,6 +242,15 @@ def heuristic_search(current_state, goal_, method):
         children = current.movGen()
 
         flag = 0 #HHIILL
+
+        # i = heuristic_function(children, goal_.design, blocks_keys)
+        # child = children.pop(i)
+        # child.parent = current
+        # if goalTest(child, goal_)==True:
+        #     return child
+        # queue.append(child)
+        # visited.append(child.ui)
+
         for child in children:
             if goalTest(child, goal_)==True:
                 return child
