@@ -15,74 +15,73 @@ class Design:
 
     def movGen(self):
 
-        children = []
-        des = deepcopy(self.design)
+        des = self.design
+        result = []
 
         # all candidate moves
         candidate_moves = []
         for d in des:
             if des[d][1] == 'c':
                 candidate_moves.append(d)
+                """
+                moving block:
+                all open top blocks are movable
+                all open top blocks are available for any other movable block
 
-        for moving_block in candidate_moves:
-            """
-            moving block:
-            all open top blocks are movable
-            all open top blocks are available for any other movable block
+                additionally all empty table places are open for moving blocks
+                """
+        for block in candidate_moves:
 
-            additionally all empty table places are open for moving blocks
-            """
             for target_block in candidate_moves:
-                if moving_block != target_block:
-
+                if block != target_block:
                     temp = deepcopy(des)
-                    move = []
-                    move.append(moving_block)
-                    distance = 0
-                    temp[moving_block][0] = target_block
+                    open_top = temp[block][0]
+                    temp[block][0] = target_block
                     temp[target_block][1] = 'u'
+                    move = []
+                    distance = 0
+                    move.append(block)
+                    if open_top != '-':
+                        temp[open_top][1] = 'c'
 
-                    if temp[moving_block][0] != '-':
-                        temp[temp[moving_block][0]][1] = 'c'
-                        move.append(temp[moving_block][0])
+                        move.append(open_top)
                     else:
                         move.append('table')
 
                     move.append(target_block)
                     distance = self.distance + 1
 
-                    children.append(Design(design = temp, parent = self, move = move, distance = distance))
+                    result.append(Design(design = temp, parent = self, move = move, distance = distance))
 
             """
-            only 3 stacks are allowed
-            remove below loops to allow infinite
+            restriction of three stacks
             """
-
             count_on_table = 0
-            for block in des:
+            for block_ in des:
                 if des[block][0] == '-':
                     count_on_table += 1
 
             if count_on_table > 2:
                 continue
-            else :
-                if des[moving_block][0] != '-':
-                    temp = deepcopy(des)
-                    move = []
-                    distance = 0
 
-                    move.append(moving_block)
-                    move.append(temp[moving_block][0])
-                    temp[temp[moving_block][0]][1] = 'c'
-                    temp[moving_block][0] = '-'
+            if des[block][0] != '-':
+                temp = deepcopy(des)
+                move = []
+                distance = 0
 
-                    move.append('table')
-                    distance = self.distance + 1
+                open_top = temp[block][0]
 
-                    children.append(Design(design = temp, parent = self, move = move, distance = distance))
+                temp[block][0] = '-'
+                temp[open_top][1] = 'c'
 
-        return children
+                move.append(block)
+                move.append(open_top)
+                move.append('table')
 
+                distance = self.distance + 1
+                result.append(Design(design = temp, parent = self, move = move, distance = distance))
+
+        return result
     def conversion(self):
         design = deepcopy(self.design)
         list = []
@@ -110,6 +109,8 @@ class Design:
         for i in list:
             print(i)
         print()
+
+        return list
 
 
 def unique_identifier(design):
@@ -154,12 +155,12 @@ def two_heuristic(children, goal_, blocks_keys):
     result = values.index(min(values))
     return result
 
-
 def goalTest(design, goal_design):
     """
     GoalTest Function
     """
     return design == goal_design
+
 def read_in(filename):
 
     with open(filename) as f:
@@ -216,7 +217,7 @@ def heuristic_search(current_state, goal_, method):
     """
     change heuristic from here.
     """
-    heuristic_function = wrongly_placed
+    # heuristic_function = wrongly_placed
     heuristic_function = two_heuristic
     # ***********************************************************************
 
@@ -225,15 +226,16 @@ def heuristic_search(current_state, goal_, method):
 
     queue.append(current_state)
     blocks_keys = list(current_state.design.keys())
-    visited.append(current_state.ui)     #Add the id of the state to the set.
+    visited.append(current_state.ui)
 
     while len(queue):
         print("states Explored : ", len(visited))
         i = heuristic_function(queue, goal_.design, blocks_keys)
         current = queue.pop(i)
-        # current = queue.pop(0)
 
-        if goalTest(current, goal_)==True:
+        print(current.conversion())
+
+        if goalTest(current.conversion(), goal_.conversion())==True:
             return current
 
         #generate all possible children for current node
@@ -252,8 +254,6 @@ def heuristic_search(current_state, goal_, method):
             # if flag == 1:
             #     break
 
-
-
 def main():
 
     if len(sys.argv) == 4:
@@ -262,8 +262,8 @@ def main():
         out = sys.argv[3]
 
         start_, goal_ = read_in(filename = in_)
-        solution = heuristic_search(current_state = start_, goal_ = goal_, method = method)
-
+        solution = heuristic_search(current_state = start_, goal_ = goal_,method=method)
+        print(solution)
         if solution == goal_:
             number_of_moves = pretty_print(solution = solution, filename = out)
             print('total steps:', number_of_moves)
