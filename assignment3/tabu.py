@@ -12,8 +12,8 @@ class Node:
                 temp_literals = copy.deepcopy(self.literal_list)
                 temp_literals[index] = int(not temp_literals[index])
                 temp_tt = copy.deepcopy(self.tabu_tenure_list)
-                for j in temp_tt:
-                    j = j - 1
+                for i, j in enumerate(temp_tt):
+                    temp_tt[i] = max(temp_tt[i]-1, 0)
 
                 temp_tt[index] = tt
                 neighbours.append(Node(temp_literals, temp_tt))
@@ -30,88 +30,84 @@ class Node:
         return self.tabu_tenure_list
 
 def generate_CNF(testcase):
-    testcase = "(~dvavc)^(~dv~bv~c)^(avcvd)^(~cv~av~d)^(~cv~bva)"
+    testcase = testcase
     testcase = testcase.replace("(", "")
     testcase = testcase.replace(")", "")
     clauses = testcase.split("^")
     literals = []
     for i in clauses:
-        literals.append([i.split("v")])
+        save = i.split("v")
+        real_list = []
 
-    print(literals)
+        for lit in save:
+            if lit=="a":
+                real_list.append(0)
+            elif lit == "~a":
+                real_list.append(1)
+            elif lit == "b":
+                real_list.append(2)
+            elif lit == "~b":
+                real_list.append(3)
+            elif lit == "c":
+                real_list.append(4)
+            elif lit == "~c":
+                real_list.append(5)
+            elif lit == "d":
+                real_list.append(6)
+            elif lit == "~d":
+                real_list.append(7)
 
-def f1(node_):
+        literals.append(real_list)
+
+    return literals
+
+def clause_values(node_,literals_values):
     literals = node_.get_literals()
+    literals_values_bool = []
+    for i in range(4):
+        literals_values_bool.append(literals[i])
+        literals_values_bool.append(int(not literals[i]))
 
-    a = literals[0]
-    b = literals[1]
-    c = literals[2]
-    d = literals[3]
-    # (~dvavc)^(~dv~bv~c)^(avcvd)^(~cv~av~d)^(~cv~bva)
-    return int(((not d) or (a) or (c)))
+    one = literals_values_bool[literals_values[0]]
+    two = literals_values_bool[literals_values[1]]
+    three = literals_values_bool[literals_values[2]]
+    return int((one or two or three))
 
-def f2(node_):
-    literals = node_.get_literals()
-    a = literals[0]
-    b = literals[1]
-    c = literals[2]
-    d = literals[3]
-    # (~dvavc)^(~dv~bv~c)^(avcvd)^(~cv~av~d)^(~cv~bva)
-    return int(((not d) or (b) or (not c)))
+def calc(node_,literals_values):
+    return clause_values(node_,literals_values[0]) and clause_values(node_,literals_values[1]) and clause_values(node_,literals_values[2]) and clause_values(node_,literals_values[3]) and clause_values(node_,literals_values[4])
 
-def f3(node_):
-    literals = node_.get_literals()
-    a = literals[0]
-    b = literals[1]
-    c = literals[2]
-    d = literals[3]
-    # (~dvavc)^(~dv~bv~c)^(avcvd)^(~cv~av~d)^(~cv~bva)
-    return int(((a) or (c) or (d)))
+def heuristic_function(node_,literals_values):
+    return clause_values(node_,literals_values[0]) + clause_values(node_,literals_values[1]) + clause_values(node_,literals_values[2]) + clause_values(node_,literals_values[3]) + clause_values(node_,literals_values[4])
 
-def f4(node_):
-    literals = node_.get_literals()
-    a = literals[0]
-    b = literals[1]
-    c = literals[2]
-    d = literals[3]
-    # (~dvavc)^(~dv~bv~c)^(avcvd)^(~cv~av~d)^(~cv~bva)
-    return int(((not c) or (not b) or (a)))
+def tabu(tt, testcase):
+    literals_values = generate_CNF(testcase) #encode string 4-SAT for further processing
 
-def f5(node_):
-    literals = node_.get_literals()
-    a = literals[0]
-    b = literals[1]
-    c = literals[2]
-    d = literals[3]
-    # (~dvavc)^(~dv~bv~c)^(avcvd)^(~cv~av~d)^(~cv~bva)
-    return int(((not c) or (not a) or (not d)))
+    node_ = Node([0,0,0,0],[0,0,0,0]) # starting node
+    stopping_criteria = 0 #5 MAX NUMBER OF ITERATIONS ALLOWED TO AVOID INFINITE EXECUTION
 
-def calc(node_):
-    return f1(node_) and f2(node_) and f3(node_) and f4(node_) and f5(node_)
-
-def heuristic_function(node_):
-    return f1(node_) + f2(node_) + f3(node_) + f4(node_) + f5(node_)
-
-def tabu(tt):
-    node_ = Node([0,0,0,0],[0,0,0,0])
-    stopping_criteria = 100
-
-    while calc(node_) != 1:
+    while calc(node_,literals_values) != 5:
+        stopping_criteria += 1
+        if stopping_criteria > 50:
+            break
         neighbours = node_.movGen(tt)
+
+        if len(neighbours) == 0:
+            return node_, 0
+            break
+        maximum = heuristic_function(neighbours[0],literals_values)
+        node_ = neighbours[0]
         for i in neighbours:
-            if heuristic_function(i) > heuristic_function(node_):
+            if heuristic_function(i,literals_values) > maximum:
                 node_ = i
+                maximum = heuristic_function(i,literals_values)
 
-    node_.pretty_print()
-    return node_
+    return node_, 1
 
-# x = Node([0,0,0,0],[0,0,0,0])
-# neighbours = x.movGen(4)
-#
-# for i in neighbours:
-#     i.pretty_print()
-#
-# result = tabu(4)
-# print("SAT solution is : ")
-# result.pretty_print()
-generate_CNF("(~dvavc)^(~dv~bv~c)^(avcvd)^(~cv~av~d)^(~cv~bva)")
+
+result,found = tabu(3,"(dvbva)^(cv~dv~a)^(~dv~bv~c)^(bvdvc)^(av~dv~b)")
+
+print("SAT solution is : ")
+if found :
+    result.pretty_print()
+else :
+    print("Not Found : Try changing Tabu Tenure value.")
