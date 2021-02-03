@@ -29,6 +29,17 @@ class Node:
     def get_tenures(self):
         return self.tabu_tenure_list
 
+def generate_CNF(testcase):
+    testcase = "(~dvavc)^(~dv~bv~c)^(avcvd)^(~cv~av~d)^(~cv~bva)"
+    testcase = testcase.replace("(", "")
+    testcase = testcase.replace(")", "")
+    clauses = testcase.split("^")
+    literals = []
+    for i in clauses:
+        literals.append([i.split("v")])
+
+    print(literals)
+
 def f1(node_):
     literals = node_.get_literals()
 
@@ -94,12 +105,13 @@ def tabu(tt):
     node_.pretty_print()
     return node_
 
-x = Node([0,0,0,0],[0,0,0,0])
-neighbours = x.movGen(4)
-
-for i in neighbours:
-    i.pretty_print()
-
-result = tabu(4)
-print("SAT solution is : ")
-result.pretty_print()
+# x = Node([0,0,0,0],[0,0,0,0])
+# neighbours = x.movGen(4)
+#
+# for i in neighbours:
+#     i.pretty_print()
+#
+# result = tabu(4)
+# print("SAT solution is : ")
+# result.pretty_print()
+generate_CNF("(~dvavc)^(~dv~bv~c)^(avcvd)^(~cv~av~d)^(~cv~bva)")
