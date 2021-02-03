@@ -16,7 +16,7 @@ for i in range(total_no_of_testcases):
         while(abs(second_index - first_index) <= 1):
             second_index = random.randint(1,8) % 8
         third_index = random.randint(1,8) % 8
-        while(abs(second_index - third_index) <= 1 or abs(second_index - first_index) <= 1) :
+        while(abs(second_index - third_index) <= 1 or abs(third_index - first_index) <= 1) :
             third_index = random.randint(1,8) % 8
 
         test = ''.join([test,"("])
