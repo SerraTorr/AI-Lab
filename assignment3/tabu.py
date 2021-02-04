@@ -73,7 +73,7 @@ def clause_values(node_,literals_values):
     three = literals_values_bool[literals_values[2]]
     return int((one or two or three))
 
-def calc(node_,literals_values):
+def goalTest(node_,literals_values):
     return clause_values(node_,literals_values[0]) and clause_values(node_,literals_values[1]) and clause_values(node_,literals_values[2]) and clause_values(node_,literals_values[3]) and clause_values(node_,literals_values[4])
 
 def heuristic_function(node_,literals_values):
@@ -81,18 +81,20 @@ def heuristic_function(node_,literals_values):
 
 def tabu(tt, testcase):
     literals_values = generate_CNF(testcase) #encode string 4-SAT for further processing
-
     node_ = Node([0,0,0,0],[0,0,0,0]) # starting node
     stopping_criteria = 0 #5 MAX NUMBER OF ITERATIONS ALLOWED TO AVOID INFINITE EXECUTION
 
-    while calc(node_,literals_values) != 5:
+    while goalTest(node_,literals_values) == 0:
+        # print(stopping_criteria, goalTest(node_, literals_values), end=" ")
+        # node_.pretty_print()
+
         stopping_criteria += 1
         if stopping_criteria > 50:
             break
         neighbours = node_.movGen(tt)
 
         if len(neighbours) == 0:
-            return node_, 0
+            return node_, 0, stopping_criteria
             break
         maximum = heuristic_function(neighbours[0],literals_values)
         node_ = neighbours[0]
@@ -101,11 +103,34 @@ def tabu(tt, testcase):
                 node_ = i
                 maximum = heuristic_function(i,literals_values)
 
-    return node_, 1
+    return node_, 1, stopping_criteria
 
 
-result,found = tabu(3,"(dvbva)^(cv~dv~a)^(~dv~bv~c)^(bvdvc)^(av~dv~b)")
+def process_file(filename):
+    file = open(filename, 'r')
 
+    candidate_tabu_tenures = [1,2,3,4,6,8] # candidate tabu tenures
+
+    database_list = []
+    for line in file:
+        line = line.replace("\n","")
+        list_for_string = []
+        for tt in candidate_tabu_tenures:
+            result,found,sc = tabu(tt,line)
+            list_for_string.append(sc)
+            list_for_string.append(found)
+        database_list.append(list_for_string)
+
+    for i in database_list:
+        for j in i:
+            print(j,end=" ")
+        print()
+# process_file("testcases.txt")
+
+
+
+result,found,sc = tabu(3,"(av~bv~c)^(~avbvc)^(avbvc)^(av~bv~c)^(av~bv~c)")
+print(sc)
 print("SAT solution is : ")
 if found :
     result.pretty_print()
