@@ -71,7 +71,8 @@ def clause_values(node_,literals_values):
     one = literals_values_bool[literals_values[0]]
     two = literals_values_bool[literals_values[1]]
     three = literals_values_bool[literals_values[2]]
-    return int((one or two or three))
+    four = literals_values_bool[literals_values[3]] #comment this line and update next line for 3 literals per clauses 
+    return int((one or two or three or four))
 
 def goalTest(node_,literals_values):
     return clause_values(node_,literals_values[0]) and clause_values(node_,literals_values[1]) and clause_values(node_,literals_values[2]) and clause_values(node_,literals_values[3]) and clause_values(node_,literals_values[4])
@@ -105,7 +106,6 @@ def tabu(tt, testcase):
 
     return node_, 1, stopping_criteria
 
-
 def process_file(filename):
     file = open(filename, 'r')
 
@@ -118,7 +118,6 @@ def process_file(filename):
         for tt in candidate_tabu_tenures:
             result,found,sc = tabu(tt,line)
             list_for_string.append(sc)
-            list_for_string.append(found)
         database_list.append(list_for_string)
 
     for i in database_list:
@@ -129,7 +128,7 @@ def process_file(filename):
 
 
 
-result,found,sc = tabu(3,"(av~bv~c)^(~avbvc)^(avbvc)^(av~bv~c)^(av~bv~c)")
+result,found,sc = tabu(3,"(~av~bv~cv~d)^(bvav~bvd)^(cv~av~bvd)^(avbvcvd)^(avbvcv~d)")
 print(sc)
 print("SAT solution is : ")
 if found :

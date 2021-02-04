@@ -117,8 +117,8 @@ def clause_values(node_,literals_values):
     one = literals_values_bool[literals_values[0]]
     two = literals_values_bool[literals_values[1]]
     three = literals_values_bool[literals_values[2]]
-
-    return int((one or two or three))
+    four = literals_values_bool[literals_values[3]]  #comment this line and update next line for 3 literals per clauses 
+    return int((one or two or three or four))
 
 def goalTest(node_,testcase):
     CNF = generate_CNF(testcase)
@@ -130,7 +130,9 @@ def calc(node_,testcase):
 
 def hill_climbing(node_, mov,testcase):
 
+    iterations = 0
     while goalTest(node_,testcase) == 0:
+        iterations += 1
         neighbours = node_.get_movGen(node_,mov)
         if calc(find_max(neighbours,testcase),testcase) > calc(node_,testcase):
             node_ = find_max(neighbours,testcase)
@@ -138,6 +140,7 @@ def hill_climbing(node_, mov,testcase):
         else :
             return node_
 
+    print("Iteratiosn :", iterations)
     return node_
 
 def VND(testcase):
@@ -171,4 +174,4 @@ def VND(testcase):
 # for i in x:
 #     i.pretty_print()
 
-VND("(bvdva)^(~dvcvb)^(~avdvc)^(~bvav~d)^(~bv~dv~a)")[0].pretty_print()
+VND("(av~bv~cvd)^(bv~av~bvd)^(cv~av~bvd)^(avbvcvd)^(~avbvcvd)")[0].pretty_print()
