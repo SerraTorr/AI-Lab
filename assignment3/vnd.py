@@ -114,11 +114,11 @@ def clause_values(node_,literals_values):
         literals_values_bool.append(literals[i])
         literals_values_bool.append(int(not literals[i]))
 
-    one = literals_values_bool[literals_values[0]]
-    two = literals_values_bool[literals_values[1]]
-    three = literals_values_bool[literals_values[2]]
-    four = literals_values_bool[literals_values[3]]  #comment this line and update next line for 3 literals per clauses 
-    return int((one or two or three or four))
+    clause_value = literals_values_bool[literals_values[0]]
+    for i in literals_values:
+        clause_value = clause_value or literals_values_bool[i]
+
+    return clause_value
 
 def goalTest(node_,testcase):
     CNF = generate_CNF(testcase)
@@ -174,4 +174,4 @@ def VND(testcase):
 # for i in x:
 #     i.pretty_print()
 
-VND("(av~bv~cvd)^(bv~av~bvd)^(cv~av~bvd)^(avbvcvd)^(~avbvcvd)")[0].pretty_print()
+VND("(av~bvcvd)^(bv~av~bvd)^(cv~av~bvd)^(avbvcvd)^(~avbvcvd)")[0].pretty_print()

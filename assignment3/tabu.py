@@ -68,11 +68,11 @@ def clause_values(node_,literals_values):
         literals_values_bool.append(literals[i])
         literals_values_bool.append(int(not literals[i]))
 
-    one = literals_values_bool[literals_values[0]]
-    two = literals_values_bool[literals_values[1]]
-    three = literals_values_bool[literals_values[2]]
-    four = literals_values_bool[literals_values[3]] #comment this line and update next line for 3 literals per clauses 
-    return int((one or two or three or four))
+    clause_value = literals_values_bool[literals_values[0]]
+    for i in literals_values:
+        clause_value = clause_value or literals_values_bool[i]
+
+    return clause_value
 
 def goalTest(node_,literals_values):
     return clause_values(node_,literals_values[0]) and clause_values(node_,literals_values[1]) and clause_values(node_,literals_values[2]) and clause_values(node_,literals_values[3]) and clause_values(node_,literals_values[4])
@@ -128,7 +128,7 @@ def process_file(filename):
 
 
 
-result,found,sc = tabu(3,"(~av~bv~cv~d)^(bvav~bvd)^(cv~av~bvd)^(avbvcvd)^(avbvcv~d)")
+result,found,sc = tabu(3,"(~av~bv~cv~d)^(bvav~bvd)^(cv~avbvd)^(avbvcvd)^(avbvcv~d)")
 print(sc)
 print("SAT solution is : ")
 if found :
