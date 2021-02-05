@@ -56,6 +56,18 @@ def generate_CNF(testcase):
                 real_list.append(6)
             elif lit == "~d":
                 real_list.append(7)
+            elif lit == "e":
+                real_list.append(8)
+            elif lit == "~e":
+                real_list.append(9)
+            elif lit == "f":
+                real_list.append(10)
+            elif lit == "~f":
+                real_list.append(11)
+            elif lit == "g":
+                real_list.append(12)
+            elif lit == "~g":
+                real_list.append(13)
 
         literals.append(real_list)
 
@@ -118,20 +130,20 @@ def process_file(filename):
         for tt in candidate_tabu_tenures:
             result,found,sc = tabu(tt,line)
             list_for_string.append(sc)
+            result.pretty_print()
         database_list.append(list_for_string)
 
-    for i in database_list:
-        for j in i:
-            print(j,end=" ")
-        print()
-# process_file("testcases.txt")
+    # for i in database_list:
+    #     for j in i:
+    #         print(j,end=" ")
+    #     print()
 
-
-
-result,found,sc = tabu(3,"(~av~bv~cv~d)^(bvav~bvd)^(cv~avbvd)^(avbvcvd)^(avbvcv~d)")
-print(sc)
-print("SAT solution is : ")
-if found :
-    result.pretty_print()
-else :
-    print("Not Found : Try changing Tabu Tenure value.")
+process_file("testcases.txt")
+#
+# result,found,sc = tabu(3,"(avbvcvd)^(avbvcvd)^(evfvgva)^(evfvgva)^(avcvevf)")
+# print(sc)
+# print("SAT solution is : ")
+# if found :
+#     result.pretty_print()
+# else :
+#     print("Not Found : Try changing Tabu Tenure value.")

@@ -30,6 +30,5 @@ for i in range(total_no_of_testcases):
     testcases.append(test)
 
 
-
 for i in testcases:
     print(i[:len(i)-1])
