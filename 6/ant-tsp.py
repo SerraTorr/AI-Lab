@@ -41,7 +41,7 @@ class Ant(object):
     def probability_function(self, alpha, beta, pheromone, distance, i, j):
         return (pheromone[i][j] ** alpha ) * ((1 / distance[i][j]) ** beta)
 
-class TSP(object):
+class ant_algorithm_optimisation(object):
     def __init__(self, filename):
         with open(filename, 'r') as inp_file:
             lines = inp_file.readlines()
@@ -76,7 +76,7 @@ class TSP(object):
     def INT_MAX_(self):
         return float('Inf')
 
-    def ant_colony_optimizer(self, vaporisation_rate, memory):
+    def ant_algorithm(self, vaporisation_rate, memory):
         # hyperparameters initialisation
         alpha = 3
         beta = 5
@@ -94,7 +94,7 @@ class TSP(object):
         flag = False
 
         while True:
-            if (time() - start_time) > 220:
+            if (time() - start_time) > 299:
                 break
 
             routes = []
@@ -113,7 +113,6 @@ class TSP(object):
                     best_cost = curr_cost
 
             ants = list(range(num_ants))
-            # sortedAnts = [x for _, x in sorted(zip(route_costs, ants))]
             sortedAnts = []
             for i,j in sorted(zip(route_costs, ants)):
                 sortedAnts.append(j)
@@ -127,26 +126,21 @@ class TSP(object):
 
             if last_cost == best_cost:
                 identical_cost += 1
+                if identical_cost>5:
+                    pheromone = reset
+                    identical_cost = 0
             else:
                 identical_cost = 0
 
             last_cost = best_cost
 
-            if identical_cost >= 10:
-                if self.num_cities < 200:
-                    pheromone = reset
-                    identical_cost = 0
-
             print(*best_route)
             print(best_cost)
-
-        print(*best_route)
-        print(best_cost)
 
         return best_cost
 
 
 start_time = time()
 
-T = TSP(sys.argv[1])
-T.ant_colony_optimizer(0.3, 50)
+T = ant_algorithm_optimisation(sys.argv[1])
+T.ant_algorithm(0.3, 50)
