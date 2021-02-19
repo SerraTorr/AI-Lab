@@ -38,7 +38,6 @@ class Ant(object):
 
         return next_city
 
-
     def probability_function(self, alpha, beta, pheromone, distance, i, j):
         return (pheromone[i][j] ** alpha ) * ((1 / distance[i][j]) ** beta)
 
@@ -47,11 +46,21 @@ class TSP(object):
         with open(filename, 'r') as inp_file:
             lines = inp_file.readlines()
 
-        self.distance = []
+        type_ = lines[0] # euclidean or noneuclidean
         self.num_cities = int(lines[1].strip())
-        for idx in range(self.num_cities + 2, len(lines)):
-            temp_line = lines[idx].strip()
-            self.distance.append(list(map(float, temp_line.split(" "))))
+        self.coordinates = []
+
+        for point in range(self.num_cities+2):
+            self.coordinates.append(lines[point])
+
+        self.distance = self.extract_distances(self.num_cities, lines)
+
+    def extract_distances(self, totalCities, lines):
+        distance = []
+        for index in range(totalCities+2, len(lines)):
+            line = lines[index].strip()
+            distance.append(list(map(float, line.split(" "))))
+        return distance
 
     def cost_of_route(self, route):
         cost = 0
