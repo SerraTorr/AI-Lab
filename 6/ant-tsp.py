@@ -63,9 +63,9 @@ class TSP(object):
 
     def cost_(self, route):
         c = 0
-        for city in range(len(route) - 1):
+        for i in range(len(route) - 1):
             # cost += self.distance[route[city+1]][route[city]]
-            c += self.distance[route[city]][route[city+1]]
+            c += self.distance[route[i]][route[i+1]]
             """
             In case of euclidean distance city and city + 1 could be reversed
             not in case of non-euclidean (non symetric case)
@@ -73,21 +73,23 @@ class TSP(object):
 
         return c
 
+    def INT_MAX_(self):
+        return float('Inf')
+
     def ant_colony_optimizer(self, alpha, beta, Q, nad, retain):
-        # Init hyperparams
         vaporisation_rate = 0.3 # evaporation coefficient
         num_ants = int(self.num_cities // nad)
 
         # Init pheromone
         rand_f = random.random() / 10
         pheromone = np.ones((self.num_cities, self.num_cities)) * rand_f
-        init_pheromone = pheromone
+        reset = pheromone
 
         # Init best route
-        best_route, best_cost = [], float('Inf')
+        best_route, best_cost = [], self.INT_MAX_()
 
         # start algo
-        last_cost = float('Inf')
+        last_cost = self.INT_MAX_()
         identical_cost = 0
         broken, last_iter = False, False
         while True:
@@ -95,43 +97,34 @@ class TSP(object):
                 last_iter = True
 
             routes = []
-            # print(f"Iter: {curr_iter}", f"Best cost: {best_cost}")
-
             route_costs = []
-            routes = []
 
-            # Simulate all ants
-            try:
-                for l in range(num_ants):
-                    if last_iter is True:
-                        if (time() - start_time) > 290:
-                            broken = True
-                            break
-                    ant = Ant(self.num_cities)
-                    curr_route = ant.movGen(self.distance, pheromone, self.num_cities, alpha, beta)
-                    curr_cost = self.cost_(curr_route)
+            for l in range(num_ants):
+                if last_iter is True:
+                    if (time() - start_time) > 290:
+                        broken = True
+                        break
+                ant = Ant(self.num_cities)
+                curr_route = ant.movGen(self.distance, pheromone, self.num_cities, alpha, beta)
+                curr_cost = self.cost_(curr_route)
+                route_costs.append(curr_cost)
+                routes.append(curr_route)
 
-                    if curr_cost < best_cost:
-                        best_cost = curr_cost
-                        best_route = curr_route[:]
-
-                    route_costs.append(curr_cost)
-                    routes.append(curr_route)
-            except TypeError as e:
-                # print(num_ants)
-                raise e
+                if curr_cost <= best_cost:
+                    best_route = curr_route[:]
+                    best_cost = curr_cost
 
             if broken is True:
                 break
 
-            # Update pheromone of top retain% ants
-            assert len(route_costs) == num_ants
             ants = list(range(num_ants))
-            sorted_ant_costs = [x for _, x in sorted(zip(route_costs, ants))]
-            ants_to_update = (num_ants * retain) // 100
+            # sortedAnts = [x for _, x in sorted(zip(route_costs, ants))]
+            sortedAnts = []
+            for i,j in sorted(zip(route_costs, ants)):
+                sortedAnts.append(j)
 
             update_pher = np.zeros((self.num_cities, self.num_cities))
-            for k in sorted_ant_costs[:ants_to_update]:
+            for k in sortedAnts[:((num_ants * retain) // 100)]:
                 for city in range(len(routes[k]) - 1):
                     update_pher[routes[k][city]][routes[k][city + 1]] += Q / route_costs[k]
 
@@ -146,16 +139,12 @@ class TSP(object):
 
             if identical_cost >= 10:
                 if self.num_cities < 200:
-                    pheromone = init_pheromone
+                    pheromone = reset
                     identical_cost = 0
 
             print(*best_route)
             print(best_cost)
 
-
-        # print best solution
-        # print("Best Cost: ", best_cost)
-        # print(best_route)
         print(*best_route)
         print(best_cost)
 
