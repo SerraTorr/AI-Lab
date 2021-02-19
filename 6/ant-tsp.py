@@ -149,8 +149,8 @@ class ant_algorithm_optimisation(object):
 
     def ant_algorithm(self, vaporisation_rate, memory):
         # hyperparameters initialisation
-        alpha = 3 # power of pheormone term
-        beta = 5 # power of visiility term
+        alpha = 2 # power of pheormone term
+        beta = 4 # power of visiility term
         Q = .2 # constant
         num_ants = int(self.num_cities)
         path = [] # stores the path
@@ -211,5 +211,5 @@ class ant_algorithm_optimisation(object):
 
 
 tick_ = time() # if time > 300 seconds breaking the programe
-T = ant_algorithm_optimisation(sys.argv[1]) # taking file name as argument 
+T = ant_algorithm_optimisation(sys.argv[1]) # taking file name as argument
 T.ant_algorithm(0.3, 50)
