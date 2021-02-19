@@ -6,13 +6,14 @@ from time import time
 
 class Ant(object):
     def __init__(self, num_cities):
-        self.route = [random.randint(0, num_cities - 1)]
-
-    def reset(self):
         self.route = []
+        self.num_cities = num_cities
+        # self.route = [random.randint(0, num_cities - 1)]
 
     def simulate(self, graph, pheromone, num_cities, alpha, beta):
-        next_city = self.route[len(self.route) - 1]
+        next_city = random.randint(0, self.num_cities - 1)
+        self.route.append(next_city)
+        # next_city = self.route[len(self.route) - 1]
 
         max_iterations = 1000
         while len(self.route) != num_cities:
