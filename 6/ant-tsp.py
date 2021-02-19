@@ -5,42 +5,39 @@ from time import time
 
 
 class Ant(object):
-    def __init__(self, num_cities):
+    def __init__(self, totalCities):
         self.route = []
-        self.num_cities = num_cities
-        # self.route = [random.randint(0, num_cities - 1)]
+        self.num_cities = totalCities
 
-    def simulate(self, graph, pheromone, num_cities, alpha, beta):
+    def movGen(self, distance, pheromone, num_cities, alpha, beta):
         next_city = random.randint(0, self.num_cities - 1)
         self.route.append(next_city)
-        # next_city = self.route[len(self.route) - 1]
 
         max_iterations = 1000
         while len(self.route) != num_cities:
-            # initialise allowed
             curr_city = next_city
-            # allowed = list(set(list(range(num_cities))).difference(set(self.route)))
-
-            open_ = []
-            for i in range(num_cities):
-                if i not in self.route:
-                    open_.append(i)
-
-            # calculate cumulative probability vector
-            p_ij_k = 0
-            cum_probs = []
-            for j in range(len(open_)):
-                p_ij_k = self.probability_function(alpha, beta, pheromone, graph, curr_city, open_[j])
-                # p_ij_k = (pheromone[curr_city][open_[j]] ** alpha) * ((1 / graph[curr_city][open_[j]]) ** beta)
-                cum_probs.append(p_ij_k)
-                if open_[j] == curr_city:
-                    print("******************************")
-
-            # choose next city
-            next_city = random.choices(open_, weights=cum_probs)[0]
+            next_city = self.find_next_city(num_cities, alpha, beta, pheromone, distance, curr_city)
             self.route.append(next_city)
 
         return self.route
+
+    def find_next_city(self, num_cities, alpha, beta, pheromone, distance, curr_city):
+        open_ = []
+        for i in range(num_cities):
+            if i not in self.route:
+                open_.append(i)
+        p_ij_k = 0
+        cum_probs = []
+        for j in range(len(open_)):
+            p_ij_k = self.probability_function(alpha, beta, pheromone, distance, curr_city, open_[j])
+            cum_probs.append(p_ij_k)
+            if open_[j] == curr_city:
+                print("******************************")
+
+        next_city = random.choices(open_, weights=cum_probs)[0]
+
+        return next_city
+
 
     def probability_function(self, alpha, beta, pheromone, distance, i, j):
         return (pheromone[i][j] ** alpha ) * ((1 / distance[i][j]) ** beta)
@@ -50,17 +47,17 @@ class TSP(object):
         with open(filename, 'r') as inp_file:
             lines = inp_file.readlines()
 
-        self.graph = []
+        self.distance = []
         self.num_cities = int(lines[1].strip())
         for idx in range(self.num_cities + 2, len(lines)):
             temp_line = lines[idx].strip()
-            self.graph.append(list(map(float, temp_line.split(" "))))
+            self.distance.append(list(map(float, temp_line.split(" "))))
 
     def cost_of_route(self, route):
         cost = 0
 
         for city in range(self.num_cities - 1):
-            cost += self.graph[route[city]][route[city + 1]]
+            cost += self.distance[route[city]][route[city + 1]]
 
         return cost
 
@@ -99,7 +96,7 @@ class TSP(object):
                             broken = True
                             break
                     ant = Ant(self.num_cities)
-                    curr_route = ant.simulate(self.graph, pheromone, self.num_cities, alpha, beta)
+                    curr_route = ant.movGen(self.distance, pheromone, self.num_cities, alpha, beta)
                     curr_cost = self.cost_of_route(curr_route)
 
                     if curr_cost < best_cost:
