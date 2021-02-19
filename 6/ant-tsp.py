@@ -52,7 +52,6 @@ class TSP(object):
 
         for point in range(self.num_cities+2):
             self.coordinates.append(lines[point])
-
         self.distance = self.extract_distances(self.num_cities, lines)
 
     def extract_distances(self, totalCities, lines):
@@ -62,13 +61,17 @@ class TSP(object):
             distance.append(list(map(float, line.split(" "))))
         return distance
 
-    def cost_of_route(self, route):
-        cost = 0
+    def cost_(self, route):
+        c = 0
+        for city in range(len(route) - 1):
+            # cost += self.distance[route[city+1]][route[city]]
+            c += self.distance[route[city]][route[city+1]]
+            """
+            In case of euclidean distance city and city + 1 could be reversed
+            not in case of non-euclidean (non symetric case)
+            """
 
-        for city in range(self.num_cities - 1):
-            cost += self.distance[route[city]][route[city + 1]]
-
-        return cost
+        return c
 
     def ant_colony_optimizer(self, alpha, beta, Q, nad, retain):
         # Init hyperparams
@@ -106,7 +109,7 @@ class TSP(object):
                             break
                     ant = Ant(self.num_cities)
                     curr_route = ant.movGen(self.distance, pheromone, self.num_cities, alpha, beta)
-                    curr_cost = self.cost_of_route(curr_route)
+                    curr_cost = self.cost_(curr_route)
 
                     if curr_cost < best_cost:
                         best_cost = curr_cost
