@@ -82,9 +82,9 @@ class ant_algorithm_optimisation(object):
         beta = 5
         Q = .2
         num_ants = int(self.num_cities)
-        best_route = []
-        best_cost = self.INT_MAX_()
-        last_cost = best_cost
+        path = []
+        path_length = self.INT_MAX_()
+        last_cost = path_length
 
         reset = np.ones((self.num_cities, self.num_cities))
         pheromone = reset
@@ -108,9 +108,9 @@ class ant_algorithm_optimisation(object):
                 route_costs.append(curr_cost)
                 routes.append(curr_route)
 
-                if curr_cost <= best_cost:
-                    best_route = curr_route[:]
-                    best_cost = curr_cost
+                if curr_cost <= path_length:
+                    path = curr_route[:]
+                    path_length = curr_cost
 
             ants = list(range(num_ants))
             sortedAnts = []
@@ -124,7 +124,7 @@ class ant_algorithm_optimisation(object):
 
             pheromone = vaporisation_rate * pheromone + (1 - vaporisation_rate) * update_pher
 
-            if last_cost == best_cost:
+            if last_cost == path_length:
                 identical_cost += 1
                 if identical_cost>5:
                     pheromone = reset
@@ -132,12 +132,12 @@ class ant_algorithm_optimisation(object):
             else:
                 identical_cost = 0
 
-            last_cost = best_cost
+            last_cost = path_length
 
-            print(*best_route)
-            print(best_cost)
+            print(*path)
+            print(path_length)
 
-        return best_cost
+        return path_length
 
 
 start_time = time()
