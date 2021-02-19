@@ -92,6 +92,10 @@ class ant_algorithm_optimisation(object):
 
         return reset_pheromone
 
+    def cal_phero(self, pheromone, vaporisation_rate, reset_pheromone):
+        new_phero = vaporisation_rate * pheromone + (1 - vaporisation_rate) * reset_pheromone
+        return new_phero
+
     def ant_algorithm(self, vaporisation_rate, memory):
         # hyperparameters initialisation
         alpha = 3
@@ -129,7 +133,7 @@ class ant_algorithm_optimisation(object):
                     path = curr_route[:]
                     path_length = curr_cost
 
-            pheromone = vaporisation_rate * pheromone + (1 - vaporisation_rate) * self.reset_pheromone(Q, routes, route_costs, list(range(num_ants)), memory)
+            pheromone = self.cal_phero(pheromone, vaporisation_rate, self.reset_pheromone(Q, routes, route_costs, list(range(num_ants)), memory))
 
             if last_cost == path_length:
                 identical_cost += 1
@@ -144,6 +148,7 @@ class ant_algorithm_optimisation(object):
             print(path_length)
 
         return path_length
+
 
 tick_ = time()
 T = ant_algorithm_optimisation(sys.argv[1])
