@@ -76,17 +76,17 @@ class TSP(object):
     def INT_MAX_(self):
         return float('Inf')
 
-    def ant_colony_optimizer(self, alpha, beta, Q, nad, retain):
-        vaporisation_rate = 0.3 # evaporation coefficient
-        num_ants = int(self.num_cities // nad)
+    def ant_colony_optimizer(self, vaporisation_rate, memory):
+        # hyperparameters initialisation
+        alpha = 3
+        beta = 5
+        Q = .2
+        num_ants = int(self.num_cities)
+        best_route = []
+        best_cost = self.INT_MAX_()
 
-        # Init pheromone
-        rand_f = random.random() / 10
-        pheromone = np.ones((self.num_cities, self.num_cities)) * rand_f
-        reset = pheromone
-
-        # Init best route
-        best_route, best_cost = [], self.INT_MAX_()
+        reset = np.ones((self.num_cities, self.num_cities))
+        pheromone = reset
 
         # start algo
         last_cost = self.INT_MAX_()
@@ -124,7 +124,7 @@ class TSP(object):
                 sortedAnts.append(j)
 
             update_pher = np.zeros((self.num_cities, self.num_cities))
-            for k in sortedAnts[:((num_ants * retain) // 100)]:
+            for k in sortedAnts[:((num_ants * memory) // 100)]:
                 for city in range(len(routes[k]) - 1):
                     update_pher[routes[k][city]][routes[k][city + 1]] += Q / route_costs[k]
 
@@ -154,4 +154,4 @@ class TSP(object):
 start_time = time()
 
 T = TSP(sys.argv[1])
-T.ant_colony_optimizer(3, 5, 0.0001 * 1500, 0.75, 50)
+T.ant_colony_optimizer(0.3, 50)
