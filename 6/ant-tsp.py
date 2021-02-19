@@ -1,8 +1,7 @@
 import random
+from time import time
 import sys
 import numpy as np
-from time import time
-
 
 class Ant(object):
     def __init__(self, totalCities):
@@ -76,6 +75,23 @@ class ant_algorithm_optimisation(object):
     def INT_MAX_(self):
         return float('Inf')
 
+    def reset_pheromone(self, Q, routes, r_c, ants, memory):
+        """
+        r_c is route costs
+        ants : range from 0 to total ants
+        """
+        sortedAnts = []
+        for i,j in sorted(zip(r_c, ants)):
+            sortedAnts.append(j)
+        reset_pheromone = np.zeros((self.num_cities, self.num_cities))
+
+        candidate_ants = sortedAnts[:((len(ants) * memory) // 100)]
+        for k in candidate_ants:
+            for city in range(len(routes[k]) - 1):
+                reset_pheromone[routes[k][city]][routes[k][city + 1]] += Q / r_c[k]
+
+        return reset_pheromone
+
     def ant_algorithm(self, vaporisation_rate, memory):
         # hyperparameters initialisation
         alpha = 3
@@ -93,8 +109,9 @@ class ant_algorithm_optimisation(object):
         last_iter = False
         flag = False
 
+        max_iterations = 10000
         while True:
-            if (time() - start_time) > 299:
+            if (time() - tick_) > 299:
                 break
 
             routes = []
@@ -112,35 +129,22 @@ class ant_algorithm_optimisation(object):
                     path = curr_route[:]
                     path_length = curr_cost
 
-            ants = list(range(num_ants))
-            sortedAnts = []
-            for i,j in sorted(zip(route_costs, ants)):
-                sortedAnts.append(j)
-
-            update_pher = np.zeros((self.num_cities, self.num_cities))
-            for k in sortedAnts[:((num_ants * memory) // 100)]:
-                for city in range(len(routes[k]) - 1):
-                    update_pher[routes[k][city]][routes[k][city + 1]] += Q / route_costs[k]
-
-            pheromone = vaporisation_rate * pheromone + (1 - vaporisation_rate) * update_pher
+            pheromone = vaporisation_rate * pheromone + (1 - vaporisation_rate) * self.reset_pheromone(Q, routes, route_costs, list(range(num_ants)), memory)
 
             if last_cost == path_length:
                 identical_cost += 1
-                if identical_cost>5:
+                if identical_cost > 5:
                     pheromone = reset
                     identical_cost = 0
             else:
                 identical_cost = 0
 
             last_cost = path_length
-
             print(*path)
             print(path_length)
 
         return path_length
 
-
-start_time = time()
-
+tick_ = time()
 T = ant_algorithm_optimisation(sys.argv[1])
 T.ant_algorithm(0.3, 50)
