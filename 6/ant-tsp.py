@@ -84,26 +84,24 @@ class TSP(object):
         num_ants = int(self.num_cities)
         best_route = []
         best_cost = self.INT_MAX_()
+        last_cost = best_cost
 
         reset = np.ones((self.num_cities, self.num_cities))
         pheromone = reset
 
-        # start algo
-        last_cost = self.INT_MAX_()
         identical_cost = 0
-        broken, last_iter = False, False
+        last_iter = False
+        flag = False
+
         while True:
             if (time() - start_time) > 220:
-                last_iter = True
+                break
 
             routes = []
             route_costs = []
 
             for l in range(num_ants):
-                if last_iter is True:
-                    if (time() - start_time) > 290:
-                        broken = True
-                        break
+
                 ant = Ant(self.num_cities)
                 curr_route = ant.movGen(self.distance, pheromone, self.num_cities, alpha, beta)
                 curr_cost = self.cost_(curr_route)
@@ -113,9 +111,6 @@ class TSP(object):
                 if curr_cost <= best_cost:
                     best_route = curr_route[:]
                     best_cost = curr_cost
-
-            if broken is True:
-                break
 
             ants = list(range(num_ants))
             # sortedAnts = [x for _, x in sorted(zip(route_costs, ants))]
